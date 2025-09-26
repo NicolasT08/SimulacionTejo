@@ -12,7 +12,7 @@ namespace Clase_17_09_25
 {
     public partial class Form1 : Form
     {
-        //private BackForm backForm;
+        private BackForm backForm;
         // Campos privados en ProcessForm
         int startMouseX, startMouseY;
         int deltaX, deltaY;
@@ -25,6 +25,10 @@ namespace Clase_17_09_25
         public Form1()
         {
             InitializeComponent();
+            
+            // Crear y mostrar BackForm
+            backForm = new BackForm();
+            backForm.Show();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -65,9 +69,16 @@ namespace Clase_17_09_25
                 trajectoryY0 = deltaY * -1;
                 velocityX = deltaX;
                 velocityY = deltaY;
+                t = 0; // Resetear tiempo
                 timer1.Enabled = true;
 
                 CalcParameters();
+                
+                // Iniciar seguimiento en tiempo real
+                if (backForm != null)
+                {
+                    backForm.StartRealTimeTracking();
+                }
             }
         }
 
@@ -78,11 +89,22 @@ namespace Clase_17_09_25
             double yt = -0.5 * gravity * Math.Pow(t, 2) + velocityY * t +
             trajectoryY0;
 
+            // Calcular velocidades actuales
+            double currentVx = velocityX;
+            double currentVy = velocityY - gravity * t;
+
+            // Enviar datos a gráficos en tiempo real
+            if (backForm != null)
+            {
+                backForm.AddDataPoint(t, xt, yt, currentVx, currentVy);
+            }
+
             // Actualizar la posición del Tejo
             TejopictureBox.Location = new Point(
             initialTejoX + (int)xt,
             initialTejoY - (int)yt
             );
+            
             // Detectar colisiones
             if (TejopictureBox.Bounds.IntersectsWith(GroundpictureBox.Bounds) || TejopictureBox.Bounds.IntersectsWith(WallpictureBox.Bounds)
                 || TejopictureBox.Bounds.IntersectsWith(TowerpictureBox.Bounds) || TejopictureBox.Bounds.IntersectsWith(MousepictureBox.Bounds) )
@@ -95,6 +117,11 @@ namespace Clase_17_09_25
 
         private void restartButton_Click(object sender, EventArgs e)
         {
+            // Limpiar gráficas antes de reiniciar
+            if (backForm != null)
+            {
+                backForm.ClearCharts();
+            }
             Application.Restart();
         }
 

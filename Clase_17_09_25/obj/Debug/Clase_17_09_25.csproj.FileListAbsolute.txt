@@ -10,3 +10,14 @@ D:\NickG\Documentos\Programacion\uni\simulacion de computadores\Clase_17_09_25\C
 D:\NickG\Documentos\Programacion\uni\simulacion de computadores\Clase_17_09_25\Clase_17_09_25\obj\Debug\Clase_17_09_25.exe
 D:\NickG\Documentos\Programacion\uni\simulacion de computadores\Clase_17_09_25\Clase_17_09_25\obj\Debug\Clase_17_09_25.pdb
 D:\NickG\Documentos\Programacion\uni\simulacion de computadores\Clase_17_09_25\Clase_17_09_25\obj\Debug\Clase_17_09_25.exe.config
+C:\Users\josel\Repositories\tejo-hd\SimulacionTejo\Clase_17_09_25\bin\Debug\Clase_17_09_25.exe.config
+C:\Users\josel\Repositories\tejo-hd\SimulacionTejo\Clase_17_09_25\bin\Debug\Clase_17_09_25.exe
+C:\Users\josel\Repositories\tejo-hd\SimulacionTejo\Clase_17_09_25\bin\Debug\Clase_17_09_25.pdb
+C:\Users\josel\Repositories\tejo-hd\SimulacionTejo\Clase_17_09_25\obj\Debug\Clase_17_09_25.csproj.AssemblyReference.cache
+C:\Users\josel\Repositories\tejo-hd\SimulacionTejo\Clase_17_09_25\obj\Debug\Clase_17_09_25.BackForm.resources
+C:\Users\josel\Repositories\tejo-hd\SimulacionTejo\Clase_17_09_25\obj\Debug\Clase_17_09_25.Form1.resources
+C:\Users\josel\Repositories\tejo-hd\SimulacionTejo\Clase_17_09_25\obj\Debug\Clase_17_09_25.Properties.Resources.resources
+C:\Users\josel\Repositories\tejo-hd\SimulacionTejo\Clase_17_09_25\obj\Debug\Clase_17_09_25.csproj.GenerateResource.cache
+C:\Users\josel\Repositories\tejo-hd\SimulacionTejo\Clase_17_09_25\obj\Debug\Clase_17_09_25.csproj.CoreCompileInputs.cache
+C:\Users\josel\Repositories\tejo-hd\SimulacionTejo\Clase_17_09_25\obj\Debug\Clase_17_09_25.exe
+C:\Users\josel\Repositories\tejo-hd\SimulacionTejo\Clase_17_09_25\obj\Debug\Clase_17_09_25.pdb
