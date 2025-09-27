@@ -36,6 +36,8 @@ namespace Clase_17_09_25
 
             initialTejoX = TejopictureBox.Location.X;
             initialTejoY = TejopictureBox.Location.Y;
+
+            GenerarObjetivo();
         }
 
         private void TejopictureBox_MouseDown(object sender, MouseEventArgs e)
@@ -44,6 +46,13 @@ namespace Clase_17_09_25
             {
                 startMouseX = e.X;
                 startMouseY = e.Y;
+
+                var (v0, angle) = CalcularDisparo(MousepictureBox.Location);
+
+                if (backForm != null)
+                {
+                    backForm.SetRecomendacion(v0, angle);
+                }
             }
         }
 
@@ -61,6 +70,58 @@ namespace Clase_17_09_25
 
         }
 
+        private void GenerarObjetivo()
+        {
+            Random rnd = new Random();
+            bool posicionValida = false;
+            int x = 0, y = 0;
+
+            while (!posicionValida)
+            {
+                x = rnd.Next(200, this.ClientSize.Width - MousepictureBox.Width - 50);
+                y = rnd.Next(100, this.ClientSize.Height - MousepictureBox.Height - 100);
+
+                Rectangle candidato = new Rectangle(x, y, MousepictureBox.Width, MousepictureBox.Height);
+
+                if (!candidato.IntersectsWith(GroundpictureBox.Bounds) &&
+                    !candidato.IntersectsWith(WallpictureBox.Bounds) &&
+                    !candidato.IntersectsWith(TowerpictureBox.Bounds) &&
+                    !candidato.IntersectsWith(TejopictureBox.Bounds))
+                {
+                    posicionValida = true;
+                }
+            }
+
+            MousepictureBox.Location = new Point(x, y);
+        }
+
+        private (double v0, double angle) CalcularDisparo(Point objetivo)
+        {
+            double x0 = initialTejoX;
+            double y0 = initialTejoY;
+
+            double Xt = objetivo.X;
+            double Yt = objetivo.Y;
+
+            double dx = Xt - x0;
+            double dy = y0 - Yt; // ojo con los signos en WinForms (eje Y hacia abajo)
+            double g = 9.8;
+
+            // Escoger un ángulo (ej: 45°)
+            double angle = Math.PI / 4;
+
+            double numerator = g * dx * dx;
+            double denominator = 2 * Math.Cos(angle) * Math.Cos(angle) *
+                                 (dx * Math.Tan(angle) - dy);
+
+            if (denominator <= 0) throw new Exception("No hay solución para ese ángulo");
+
+            double v0 = Math.Sqrt(numerator / denominator);
+
+            return (v0, angle);
+        }
+
+
         private void TejopictureBox_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -71,6 +132,7 @@ namespace Clase_17_09_25
                 velocityY = deltaY;
                 t = 0; // Resetear tiempo
                 timer1.Enabled = true;
+
 
                 // Calcular parámetros y mostrar en BackForm
                 if (backForm != null)

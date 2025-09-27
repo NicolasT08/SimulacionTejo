@@ -144,7 +144,21 @@ namespace Clase_17_09_25
             );
         }
 
+        public void SetRecomendacion(double v0, double angle)
+        {
+            dataGridView3.Rows.Clear();
+            dataGridView3.Rows.Add(
+                $"{v0:F2} m/s",
+                $"{angle * (180.0 / Math.PI):F2}°"
+            );
+        }
+
         private void chart3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tabPage1_Click(object sender, EventArgs e)
         {
 
         }
