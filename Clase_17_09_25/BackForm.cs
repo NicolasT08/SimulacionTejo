@@ -144,13 +144,140 @@ namespace Clase_17_09_25
             );
         }
 
-        public void SetRecomendacion(double v0, double angle)
+        public void SetRecomendacion(double v0, double angle, bool hasSolution)
         {
             dataGridView3.Rows.Clear();
+            
+            string solutionStatus = hasSolution ? "✓ SOLUCIÓN EXISTE" : "✗ NO HAY SOLUCIÓN";
+            string solutionColor = hasSolution ? "Green" : "Red";
+            
             dataGridView3.Rows.Add(
                 $"{v0:F2} m/s",
-                $"{angle * (180.0 / Math.PI):F2}°"
+                $"{angle * (180.0 / Math.PI):F2}°",
+                solutionStatus
             );
+            
+            // Cambiar color de la fila según si existe solución
+            if (dataGridView3.Rows.Count > 0)
+            {
+                dataGridView3.Rows[dataGridView3.Rows.Count - 1].DefaultCellStyle.ForeColor = 
+                    hasSolution ? Color.Green : Color.Red;
+                dataGridView3.Rows[dataGridView3.Rows.Count - 1].DefaultCellStyle.Font = 
+                    new Font(dataGridView3.DefaultCellStyle.Font, FontStyle.Bold);
+            }
+            
+            // Si existe solución, graficar la trayectoria teórica hasta el impacto
+            if (hasSolution)
+            {
+                PlotTheoreticalTrajectory(v0, angle);
+            }
+            else
+            {
+                // Limpiar gráfico si no hay solución
+                ClearTrajectoryPlot();
+            }
+        }
+
+        private void PlotTheoreticalTrajectory(double v0, double angle)
+        {
+            // Obtener las coordenadas del tejo y objetivo desde Form1
+            var form1 = Application.OpenForms["Form1"] as Form1;
+            if (form1 == null) return;
+
+            // Usar reflexión para acceder a los campos privados de Form1
+            var initialTejoXField = typeof(Form1).GetField("initialTejoX", 
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var initialTejoYField = typeof(Form1).GetField("initialTejoY", 
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            if (initialTejoXField == null || initialTejoYField == null) return;
+
+            double x0 = (int)initialTejoXField.GetValue(form1);
+            double y0 = (int)initialTejoYField.GetValue(form1);
+            
+            // Obtener la posición del objetivo (MousepictureBox)
+            var mousePictureBoxField = typeof(Form1).GetField("MousepictureBox", 
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (mousePictureBoxField == null) return;
+            
+            var mousePictureBox = mousePictureBoxField.GetValue(form1) as PictureBox;
+            if (mousePictureBox == null) return;
+
+            double Xt = mousePictureBox.Location.X;
+            double Yt = mousePictureBox.Location.Y;
+
+            // Calcular tiempo de impacto usando la física del proyectil
+            double g = 9.8;
+            double v0x = v0 * Math.Cos(angle);
+            double v0y = v0 * Math.Sin(angle);
+            
+            double dx = Xt - x0;
+            double dy = y0 - Yt; // Invertir Y para coordenadas de WinForms
+
+            // Resolver ecuación cuadrática para encontrar tiempo de impacto
+            double a = -0.5 * g;
+            double b = v0y;
+            double c = -dy; // Posición inicial Y relativa al objetivo
+
+            double discriminant = b * b - 4 * a * c;
+            if (discriminant < 0) return; // No hay solución real
+
+            double t1 = (-b + Math.Sqrt(discriminant)) / (2 * a);
+            double t2 = (-b - Math.Sqrt(discriminant)) / (2 * a);
+            
+            double impactTime = Math.Max(t1, t2);
+            if (impactTime <= 0) return;
+
+            // Generar puntos de la trayectoria teórica
+            var trajectoryPoints = new List<DataPoint>();
+            int numPoints = 100;
+            
+            for (int i = 0; i <= numPoints; i++)
+            {
+                double t = (double)i / numPoints * impactTime;
+                double x = x0 + v0x * t;
+                double y = y0 - (v0y * t - 0.5 * g * t * t); // Invertir Y para WinForms
+                
+                trajectoryPoints.Add(new DataPoint(x, y));
+            }
+
+            // Limpiar gráfico existente y agregar nueva trayectoria
+            chartYvsT.Series.Clear();
+            var trajectorySeries = new Series("Trayectoria Teórica");
+            trajectorySeries.ChartType = SeriesChartType.Line;
+            trajectorySeries.Color = Color.Blue;
+            trajectorySeries.BorderWidth = 2;
+            trajectorySeries.MarkerStyle = MarkerStyle.None;
+            
+            foreach (var point in trajectoryPoints)
+            {
+                trajectorySeries.Points.Add(point);
+            }
+            
+            chartYvsT.Series.Add(trajectorySeries);
+            
+            // Agregar punto de impacto
+            var impactSeries = new Series("Punto de Impacto");
+            impactSeries.ChartType = SeriesChartType.Point;
+            impactSeries.Color = Color.Red;
+            impactSeries.MarkerStyle = MarkerStyle.Circle;
+            impactSeries.MarkerSize = 8;
+            impactSeries.Points.Add(new DataPoint(Xt, Yt));
+            
+            chartYvsT.Series.Add(impactSeries);
+            
+            // Configurar el gráfico
+            chartYvsT.ChartAreas[0].AxisX.Title = "Posición X (píxeles)";
+            chartYvsT.ChartAreas[0].AxisY.Title = "Posición Y (píxeles)";
+            chartYvsT.Titles.Clear();
+            chartYvsT.Titles.Add($"Trayectoria Teórica hasta Impacto (t = {impactTime:F2}s)");
+        }
+
+        private void ClearTrajectoryPlot()
+        {
+            chartYvsT.Series.Clear();
+            chartYvsT.Titles.Clear();
+            chartYvsT.Titles.Add("No hay solución matemática para esta configuración");
         }
 
         private void chart3_Click(object sender, EventArgs e)
